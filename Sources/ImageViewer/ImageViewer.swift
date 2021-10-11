@@ -7,31 +7,50 @@ public struct ImageViewer: View {
     @Binding var image: Image
     @Binding var imageOpt: Image?
     @State var caption: Text?
-    @State var closeButtonTopRight: Bool?
-    
+    @State var closeButtonTopRight: Bool
+    @State var closeButtonSystemImageName: String
+    @State var closeButtonColor: Color
+
     var aspectRatio: Binding<CGFloat>?
-    
+
     @State var dragOffset: CGSize = CGSize.zero
     @State var dragOffsetPredicted: CGSize = CGSize.zero
-    
-    public init(image: Binding<Image>, viewerShown: Binding<Bool>, aspectRatio: Binding<CGFloat>? = nil, caption: Text? = nil, closeButtonTopRight: Bool? = false) {
+
+    public init(image: Binding<Image>,
+                viewerShown: Binding<Bool>,
+                aspectRatio: Binding<CGFloat>? = nil,
+                caption: Text? = nil,
+                closeButtonTopRight: Bool = false,
+                closeButtonSystemImageName: String = "xmark",
+                closeButtonColor: Color = .white
+    ) {
         _image = image
         _viewerShown = viewerShown
         _imageOpt = .constant(nil)
         self.aspectRatio = aspectRatio
         _caption = State(initialValue: caption)
         _closeButtonTopRight = State(initialValue: closeButtonTopRight)
+        _closeButtonSystemImageName = State(initialValue:closeButtonSystemImageName)
+        _closeButtonColor = State(initialValue:closeButtonColor)
     }
-    
-    public init(image: Binding<Image?>, viewerShown: Binding<Bool>, aspectRatio: Binding<CGFloat>? = nil, caption: Text? = nil, closeButtonTopRight: Bool? = false) {
+
+    public init(image: Binding<Image?>,
+                viewerShown: Binding<Bool>,
+                aspectRatio: Binding<CGFloat>? = nil,
+                caption: Text? = nil,
+                closeButtonTopRight: Bool = false,
+                closeButtonSystemImageName: String = "xmark",
+                closeButtonColor: Color = .white) {
         _image = .constant(Image(systemName: ""))
         _imageOpt = image
         _viewerShown = viewerShown
         self.aspectRatio = aspectRatio
         _caption = State(initialValue: caption)
         _closeButtonTopRight = State(initialValue: closeButtonTopRight)
+        _closeButtonSystemImageName = State(initialValue:closeButtonSystemImageName)
+        _closeButtonColor = State(initialValue:closeButtonColor)
     }
-    
+
     func getImage() -> Image {
         if(self.imageOpt == nil) {
             return self.image
@@ -48,27 +67,27 @@ public struct ImageViewer: View {
                 ZStack {
                     VStack {
                         HStack {
-                            
-                            if self.closeButtonTopRight == true {
+
+                            if closeButtonTopRight {
                                 Spacer()
                             }
-                            
+
                             Button(action: { self.viewerShown = false }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(Color(UIColor.white))
+                                Image(systemName: closeButtonSystemImageName)
+                                    .foregroundColor(closeButtonColor)
                                     .font(.system(size: UIFontMetrics.default.scaledValue(for: 24)))
                             }
-                            
-                            if self.closeButtonTopRight != true {
+
+                            if !closeButtonTopRight {
                                 Spacer()
                             }
                         }
-                        
+
                         Spacer()
                     }
                     .padding()
                     .zIndex(2)
-                    
+
                     VStack {
                         ZStack {
                             self.getImage()
@@ -88,7 +107,7 @@ public struct ImageViewer: View {
                                             self.dragOffset = self.dragOffsetPredicted
                                         }
                                         self.viewerShown = false
-                                        
+
                                         return
                                     }
                                     withAnimation(.interactiveSpring()) {
@@ -96,21 +115,21 @@ public struct ImageViewer: View {
                                     }
                                 }
                             )
-                            
+
                             if(self.caption != nil) {
                                 VStack {
                                     Spacer()
-                                    
+
                                     VStack {
                                         Spacer()
-                                        
+
                                         HStack {
                                             Spacer()
-                                            
+
                                             self.caption
                                                 .foregroundColor(.white)
                                                 .multilineTextAlignment(.center)
-                                            
+
                                             Spacer()
                                         }
                                     }
